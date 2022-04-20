@@ -12,12 +12,16 @@
 #define sensorBack 8
 
 // motor inputs declaration
-#define m1 0
-#define m2 1
-#define m3 2
-#define m4 3
+#define m1 2
+#define m2 3
+#define m3 4
+#define m4 7
 #define enA 5
 #define enB 6
+
+// define motor speed
+#define spd 120
+#define spdDiff 20
 
 void setup()
 {
@@ -96,43 +100,45 @@ void stop()
   digitalWrite(m3, LOW);
   digitalWrite(m4, LOW);
 }
-// this function corrects robot's right deviation make it turn left
+// this function corrects robot's left deviation make it turn right
 void correctLeft()
 {
-  motorSpeed(140, 100);
+  Serial.println("I Got here");
+  motorSpeed(spd, spd-spdDiff);
   turnOnMotors();
 }
-// this function corrects robot's keft deviation make it turn right
+// this function corrects robot's right deviation make it turn left
 void correctRight()
 {
-  motorSpeed(100, 140);
+  Serial.println("I Got HERE");
+  motorSpeed(spd-spdDiff, spd);
   turnOnMotors();
 }
 // this function turns left
 void turnLeft()
 {
-  motorSpeed(255, 0);
+  motorSpeed(spd+spdDiff, 0);
   turnOnMotors();
-  delay(30);
+  
 }
 // this function turns right
 void turnRight()
 {
-  motorSpeed(0, 255);
+  motorSpeed(0, spd+spdDiff);
   turnOnMotors();
-  delay(30);
+
 }
 // this function goes straight
 void goStraight()
 {
-  motorSpeed(140, 140);
   turnOnMotors();
+  motorSpeed(spd, spd);
 }
 
 // this functions goes back
 void back()
 {
-  motorSpeed(255, 255);
+  motorSpeed(spd, spd);
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
   digitalWrite(m3, LOW);
@@ -148,7 +154,7 @@ void back()
  * B always take BACK if RIGHT isn't possible
  *
  */
-void justifyPos()
+void locatePos()
 {
   int pos = getSensorsRead();
   int backRead = digitalRead(sensorBack);
@@ -166,9 +172,11 @@ void justifyPos()
   // handle correctRight
   case B0010:
     correctRight();
+    break;
   // handle L
   case B1000:
   case B1100:
+  case B1001:
   case B1110:
     turnLeft();
     break;
@@ -192,5 +200,5 @@ void justifyPos()
 void loop()
 {
   delay(10);
-  justifyPos();
+  locatePos();
 }
