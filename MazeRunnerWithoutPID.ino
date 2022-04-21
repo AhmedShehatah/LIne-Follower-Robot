@@ -20,13 +20,13 @@
 #define enB 6
 
 // define motor speed
-#define spd 120
-#define spdDiff 20
+#define spd 160
+#define spdDiff 40
 
 void setup()
 {
 
-  // declare serial monitor for debuging
+  // declare serial monioutputtor for debuging
   Serial.begin(9600);
 
   // declare motor pins mode
@@ -119,6 +119,7 @@ void turnLeft()
 {
   motorSpeed(spd+spdDiff, 0);
   turnOnMotors();
+  delay(20);
   
 }
 // this function turns right
@@ -126,6 +127,7 @@ void turnRight()
 {
   motorSpeed(0, spd+spdDiff);
   turnOnMotors();
+  delay(20);
 
 }
 // this function goes straight
@@ -138,7 +140,7 @@ void goStraight()
 // this functions goes back
 void back()
 {
-  motorSpeed(spd, spd);
+  motorSpeed(140, 140);
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
   digitalWrite(m3, LOW);
@@ -182,12 +184,12 @@ void locatePos()
     break;
     // handle S
   case B0110:
+  case B0111:
     goStraight();
     break;
   // handle R
   case B0001:
   case B0011:
-  case B0111:
     turnRight();
     break;
   // handle B
