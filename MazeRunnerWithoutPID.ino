@@ -20,8 +20,8 @@
 #define enB 6
 
 // define motor speed
-#define spd 160
-#define spdDiff 40
+#define spd 110
+#define spdDiff 10
 
 void setup()
 {
@@ -81,8 +81,8 @@ int getSensorsRead()
 // this function controls motor speed
 void motorSpeed(int left, int right)
 {
-  analogWrite(enA, right);
-  analogWrite(enB, left);
+  analogWrite(enA, left);
+  analogWrite(enB, right);
 }
 void turnOnMotors()
 {
@@ -103,48 +103,50 @@ void stop()
 // this function corrects robot's left deviation make it turn right
 void correctLeft()
 {
-  Serial.println("I Got here");
-  motorSpeed(spd, spd-spdDiff);
+  
+  motorSpeed(spd+spdDiff, spd-spdDiff);
   turnOnMotors();
 }
 // this function corrects robot's right deviation make it turn left
 void correctRight()
 {
-  Serial.println("I Got HERE");
-  motorSpeed(spd-spdDiff, spd);
+  
+  motorSpeed(spd-spdDiff, spd+spdDiff);
   turnOnMotors();
 }
 // this function turns left
 void turnLeft()
 {
-  motorSpeed(spd+spdDiff, 0);
+  motorSpeed(0, spd+spdDiff);
   turnOnMotors();
-  delay(20);
+  delay(90);
   
 }
 // this function turns right
 void turnRight()
 {
-  motorSpeed(0, spd+spdDiff);
+  motorSpeed(spd+spdDiff, 0);
   turnOnMotors();
-  delay(20);
+  delay(90);
 
 }
 // this function goes straight
 void goStraight()
 {
   turnOnMotors();
-  motorSpeed(spd, spd);
+  motorSpeed(130, 130);
 }
 
 // this functions goes back
 void back()
 {
-  motorSpeed(140, 140);
+  delay(90);
+  motorSpeed(spd, spd);
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
   digitalWrite(m3, LOW);
   digitalWrite(m4, HIGH);
+  
 }
 /**
  * jsutifyPos takes sensors read and corrects robot path
@@ -168,11 +170,11 @@ void locatePos()
       stop();
     break;
   // handle correctLeft
-  case B0100:
+  case B0010:
     correctLeft();
     break;
   // handle correctRight
-  case B0010:
+  case B0100:
     correctRight();
     break;
   // handle L
