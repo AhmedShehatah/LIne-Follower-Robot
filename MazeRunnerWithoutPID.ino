@@ -1,3 +1,8 @@
+char test[15];
+int idx;
+bool flag;
+
+
 // sensors declaration
 /*
  * sensorLeft for tracing if the robot has to turn left
@@ -21,8 +26,9 @@
 
 // define motor speed
 #define spd 110
-#define spdDiff 10
-
+#define spdDiff 50
+#define turnSpd 130
+#define spdStraight 130
 void setup()
 {
 
@@ -69,13 +75,6 @@ int getSensorsRead()
   for (int i = 0; i < 4; i++)
     if (sensorsRead[i] == HIGH)
       result += 1 << (3 - i);
-
-  // check shifting
-  for (int i = 0; i < 4; i++)
-    Serial.print(sensorsRead[i]);
-  Serial.println("");
-  Serial.println(result);
-
   return result;
 }
 // this function controls motor speed
@@ -91,6 +90,7 @@ void turnOnMotors()
   digitalWrite(m3, HIGH);
   digitalWrite(m4, LOW);
 }
+
 // this function stops the robot at the end of the path
 void stop()
 {
@@ -99,55 +99,71 @@ void stop()
   digitalWrite(m2, LOW);
   digitalWrite(m3, LOW);
   digitalWrite(m4, LOW);
+  show();
 }
 // this function corrects robot's left deviation make it turn right
 void correctLeft()
 {
-  
-  motorSpeed(spd+spdDiff, spd-spdDiff);
+  motorSpeed(spd+spdDiff, spd);
   turnOnMotors();
 }
 // this function corrects robot's right deviation make it turn left
 void correctRight()
 {
-  
-  motorSpeed(spd-spdDiff, spd+spdDiff);
+//  Serial.println("I got here");
+  motorSpeed(spd, spd+spdDiff);
   turnOnMotors();
 }
 // this function turns left
 void turnLeft()
 {
-  motorSpeed(0, spd+spdDiff);
+  motorSpeed(0, turnSpd);
   turnOnMotors();
-  delay(90);
-  
+  delay(50);
+  test[idx] = 'L';
+  idx++;
+
 }
 // this function turns right
 void turnRight()
 {
-  motorSpeed(spd+spdDiff, 0);
+  motorSpeed(turnSpd, 0);
   turnOnMotors();
-  delay(90);
+  delay(50);
+  test[idx] = 'B';
+  idx++;
 
 }
 // this function goes straight
 void goStraight()
 {
-  turnOnMotors();
-  motorSpeed(130, 130);
+  turnOnMotors(); 
+  motorSpeed(spdStraight, spdStraight); //Motor Speed 
 }
 
 // this functions goes back
 void back()
 {
-  delay(90);
-  motorSpeed(spd, spd);
-  digitalWrite(m1, HIGH);
-  digitalWrite(m2, LOW);
-  digitalWrite(m3, LOW);
-  digitalWrite(m4, HIGH);
-  
+  delay(50);
+  motorSpeed(120, 120);
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, HIGH);
+  digitalWrite(m3, HIGH);
+  digitalWrite(m4, LOW);
+  test[idx] = 'B';
+  idx++;
+
 }
+void show(){
+
+if(!flag)
+{for(int i = 0;i<500;i++){
+  if(test[i] !=0)
+  Serial.println(test[i]);
+  else {flag = true;break;}  }
+}
+}
+
 /**
  * jsutifyPos takes sensors read and corrects robot path
  * using LSRB Algorithm
@@ -168,30 +184,38 @@ void locatePos()
   case B1111:
     if (backRead)
       stop();
+      
     break;
   // handle correctLeft
   case B0010:
+  case B0011:
     correctLeft();
     break;
   // handle correctRight
+  case B1100:
   case B0100:
     correctRight();
     break;
   // handle L
-  case B1000:
-  case B1100:
-  case B1001:
-  case B1110:
+  case B1000:// just left
+  case B1001: // T
+  case B1110: // left and straight
+  case B1010:
+  case B1011:
+  case B1101:
     turnLeft();
     break;
     // handle S
   case B0110:
+    goStraight();
+    break;
   case B0111:
     goStraight();
+      test[idx] = 'S';
+      idx++;
     break;
   // handle R
   case B0001:
-  case B0011:
     turnRight();
     break;
   // handle B
@@ -203,6 +227,6 @@ void locatePos()
 
 void loop()
 {
-  delay(10);
+  delay(4);
   locatePos();
 }
