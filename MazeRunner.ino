@@ -1,8 +1,3 @@
-char test[15];
-int idx;
-bool flag;
-
-
 // sensors declaration
 /*
  * sensorLeft for tracing if the robot has to turn left
@@ -25,9 +20,9 @@ bool flag;
 #define enB 6
 
 // define motor speed
-#define spd 110
-#define spdDiff 50
-#define turnSpd 130
+#define spd 130
+#define spdDiff 40
+#define turnSpd 13l0
 #define spdStraight 130
 void setup()
 {
@@ -49,7 +44,7 @@ void setup()
   pinMode(sensorCorrectRight, INPUT);
   pinMode(sensorRight, INPUT);
   pinMode(sensorBack, INPUT);
-}
+delay(200);}
 
 /*
  *
@@ -90,7 +85,6 @@ void turnOnMotors()
   digitalWrite(m3, HIGH);
   digitalWrite(m4, LOW);
 }
-
 // this function stops the robot at the end of the path
 void stop()
 {
@@ -99,19 +93,19 @@ void stop()
   digitalWrite(m2, LOW);
   digitalWrite(m3, LOW);
   digitalWrite(m4, LOW);
-  show();
+  
 }
 // this function corrects robot's left deviation make it turn right
 void correctLeft()
 {
-  motorSpeed(spd+spdDiff, spd);
+  motorSpeed(spd+spdDiff, spd-spdDiff);
   turnOnMotors();
 }
 // this function corrects robot's right deviation make it turn left
 void correctRight()
 {
 //  Serial.println("I got here");
-  motorSpeed(spd, spd+spdDiff);
+  motorSpeed(spd-spdDiff, spd+spdDiff);
   turnOnMotors();
 }
 // this function turns left
@@ -120,9 +114,7 @@ void turnLeft()
   motorSpeed(0, turnSpd);
   turnOnMotors();
   delay(50);
-  test[idx] = 'L';
-  idx++;
-
+ 
 }
 // this function turns right
 void turnRight()
@@ -130,8 +122,7 @@ void turnRight()
   motorSpeed(turnSpd, 0);
   turnOnMotors();
   delay(50);
-  test[idx] = 'B';
-  idx++;
+ 
 
 }
 // this function goes straight
@@ -150,19 +141,9 @@ void back()
   digitalWrite(m2, HIGH);
   digitalWrite(m3, HIGH);
   digitalWrite(m4, LOW);
-  test[idx] = 'B';
-  idx++;
+ 
+}
 
-}
-void show(){
-
-if(!flag)
-{for(int i = 0;i<500;i++){
-  if(test[i] !=0)
-  Serial.println(test[i]);
-  else {flag = true;break;}  }
-}
-}
 
 /**
  * jsutifyPos takes sensors read and corrects robot path
@@ -201,18 +182,12 @@ void locatePos()
   case B1001: // T
   case B1110: // left and straight
   case B1010:
-  case B1011:
-  case B1101:
     turnLeft();
     break;
     // handle S
   case B0110:
-    goStraight();
-    break;
   case B0111:
     goStraight();
-      test[idx] = 'S';
-      idx++;
     break;
   // handle R
   case B0001:
